@@ -6,6 +6,7 @@ import monix.execution.schedulers.TestScheduler
 import scala.concurrent.{ExecutionContext, Future}
 import monix.execution.Scheduler.Implicits.global
 
+import scala.collection.mutable
 import scala.util.Random
 object DeferFutureActionExample extends App {
 
@@ -116,18 +117,51 @@ object DeferFutureActionExample extends App {
   val s = groupedmapData.map { case (word, count) => s"($word,$count)" }.toList
   s.foreach(println)
 
+
+
+
+  //pure function are the function which does not change the variable its passed
+  // like return x+10 it does not chnage the value of x if use like x = x+10 it change the value of x. so
+  // first function is pure other is impure
+
+
+  //write a program to get the first non-repeatative character in the string "my name is meenakshi:"
+
+  def nonRepeative(str: String): Char = {
+    val count = str.groupBy(identity).mapValues(_.length)
+    println(str.groupBy(identity))
+    str.find(c => count(c) == 1).get
+  }
+
+
+  def orderNonRepeative(str: String) = {
+    val countMap = new mutable.LinkedHashMap[Char, Int]
+    str.foreach {
+      c => countMap.update(c, countMap.getOrElseUpdate(c, 0) + 1)
+    }
+    println(countMap)
+    str.find(c => countMap(c) == 1).getOrElse(' ')
+  }
+
+  println(orderNonRepeative("my name is meenakshi"))
+
+  //println(nonRepeative("my name is meenakshi"))
+
+
+  def findFirstNonRepeatingChar(str: String): Option[Char] = {
+    val charCounts = str.foldLeft(Map.empty[Char, Int]) { (counts, char) =>
+      counts + (char -> (counts.getOrElse(char, 0) + 1))
+    }
+
+    str.find(char => charCounts(char) == 1)
+  }
+
+  findFirstNonRepeatingChar("My meee")
+
+
+  val map = Map("a" -> 1, "b" -> 2)
+  val newMap = map + ("c" -> 3) // Map("a" -> 1, "b" -> 2, "c" -> 3)
+
+
 }
-
-
- //pure function are the function which does not change the variable its passed
-// like return x+10 it does not chnage the value of x if use like x = x+10 it change the value of x. so
-// first function is pure other is impure
-
-
-
-
-
-
-
-
 

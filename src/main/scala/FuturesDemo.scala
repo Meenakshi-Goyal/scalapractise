@@ -79,8 +79,6 @@ val f1  = Future{1}
 
   //combining futures
 
-  // traverse
-
   val futureOperationTraverse = List(cakeStockOption("vanilla"),
     cakeStockOption("black"),
     cakeStockOption("chocolate"),
@@ -115,6 +113,8 @@ val f1  = Future{1}
   }
 
 
+
+
   val l1 = Future{List(1,2,3)}
   val l2 = Future{List(4)}
   val l3 : (List[Int], List[Int]) => (String , List[Int]) = (x,y) => (x.toString() , y)
@@ -138,6 +138,12 @@ val f1  = Future{1}
 //  def recover(U >:T) (pf:PartialFunction(Throwable , U))
 //
 //  def recover(U >:T) (pf:PartialFunction(Throwable , Future[U]))
+
+
+
+
+
+
 
 
   //run future in a separate execution context
@@ -165,6 +171,74 @@ val f1  = Future{1}
 
 val s = List(1,2,3)
   println(s.foldLeft(0)((a,b) => a+b))
+
+
+
+  //zip
+
+  val future1: Future[Int] = Future {10}
+  val future2: Future[String] = Future {"Hello"}
+
+  val combinedFuture: Future[(Int, String)] = future1.zip(future2)
+
+  combinedFuture.foreach { case (num, str) =>
+    println(s"Number: $num, String: $str") // Prints: Number: 10, String: Hello
+  }
+
+  //zipwith
+
+
+
+
+
+  //transform
+
+  val ft = Future{throw new RuntimeException("Something went wrong!")}
+  // val ft = Future{"hello"}
+
+  val out = ft.transform{
+    case Success(value) => Success("OK")
+    case Failure(_) => Success("Fail")
+  }
+
+  out.foreach(println)
+
+
+  //recover
+
+  val recoverFuture = Future{ 3 / 0}
+  val s1 = recoverFuture.recover{
+    case _: ArithmeticException => 0
+  }
+   s1.foreach(println)
+
+  //recoverwith
+  val recoverWithFuture = Future {
+    3 / 0
+  }
+  val t = recoverWithFuture.recoverWith {
+    case _: ArithmeticException => Future{1}
+  }
+t.foreach(println)
+
+  //fallbackTo : ou can use fallbackTo to specify a fallback future that will
+  // be used if the primary future fails.
+
+  val primaryFuture: Future[String] = Future {
+    throw new RuntimeException("Primary failed")
+  }
+
+  val fallbackFuture: Future[String] = Future {
+    "Fallback result"
+  }
+
+  val resultFall: Future[String] = primaryFuture.fallbackTo(fallbackFuture)
+
+  resultFall.foreach(println) // Prints: Fallback result
+
+
+
+
 
 
 }
